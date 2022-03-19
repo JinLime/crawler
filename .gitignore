@@ -142,4 +142,4 @@ dist
 nodejs-crawler/
 
 # File
-package-lock.json
+.prettierrc

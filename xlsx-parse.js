@@ -1,3 +1,4 @@
+// 엑셀 파싱
 const xlsx = require("xlsx");
 
 const workbook = xlsx.readFile("xlsx/data.xlsx");
