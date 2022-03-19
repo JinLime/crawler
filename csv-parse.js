@@ -1,8 +1,8 @@
+// csv 파싱
 const { parse } = require("csv-parse/sync");
 const fs = require("fs");
 
 const csv = fs.readFileSync("csv/data.csv");
-// console.log(csv.toString("utf-8"));
 
 const records = parse(csv.toString("utf-8"));
 
