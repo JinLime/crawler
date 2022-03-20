@@ -11,14 +11,28 @@ records.forEach((v, i) => {
 });
 
 const crawler = async () => {
+    /*
+    // sync (순서대로)
+    for (const [i, v] of records.entries()) {
+        const response = await axios.get(v[1]);
+        if (response.status === 200) {
+            const html = response.data;
+            const $ = cheerio.load(html);
+            const text = $(".score.score_left .star_score").text();
+            console.log(v[0], "평점 :", text.trim());
+        }
+    }
+    */
+
+    // async (요청오는대로)
     await Promise.all(
-        records.map(async (r) => {
-            const response = await axios.get(r[1]);
+        records.map(async (v) => {
+            const response = await axios.get(v[1]);
             if (response.status === 200) {
                 const html = response.data;
                 const $ = cheerio.load(html);
                 const text = $(".score.score_left .star_score").text();
-                console.log(r[0], "평점 :", text.trim());
+                console.log(v[0], "평점 :", text.trim());
             }
         }),
     );
