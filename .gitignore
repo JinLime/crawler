@@ -143,4 +143,4 @@ nodejs-crawler/
 
 # File
 .prettierrc
-package-lock.json
+.eslintrc.js
