@@ -26,7 +26,7 @@ const crawler = async () => {
             if (text) {
                 console.log(v[0], "평점 :", text.trim());
             }
-            await page.waitForTimeout(5000);
+            await page.waitForTimeout(2000);
         }
 
         await page.close();
