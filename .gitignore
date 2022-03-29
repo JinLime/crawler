@@ -144,3 +144,4 @@ nodejs-crawler/
 # File
 .prettierrc
 .eslintrc.js
+.env
