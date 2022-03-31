@@ -31,13 +31,20 @@ const crawler = async () => {
         await page.hover("button"); // "button"위에 마우스 올리기
         await page.waitForTimeout(3000);
         await page.click("button");
-        await page.waitForTimeout(5000);
+
+        // waitForRequest: 요청 대기, waitForResponse: 응답 대기, waitForSelector : 요청을 안 보내는 경우
+        await page.waitForResponse((response) => {
+            console.log(response, response.url());
+            return response.url().includes("qsAiCW00XaO.js?_nc");
+        });
+
         // await page.keyboard.press("Escape"); // ESC키 누르기
         await page.click(
             'path[d="M10 14a1 1 0 0 1-.755-.349L5.329 9.182a1.367 1.367 0 0 1-.205-1.46A1.184 1.184 0 0 1 6.2 7h7.6a1.18 1.18 0 0 1 1.074.721 1.357 1.357 0 0 1-.2 1.457l-3.918 4.473A1 1 0 0 1 10 14z"]',
         );
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(3000);
         await page.click("div.a8nywdso.sj5x9vvc.rz4wbd8a.ecm0bbzt > div > div:nth-child(4)");
+
         // await browser.close();
     } catch (e) {
         console.error(e);
