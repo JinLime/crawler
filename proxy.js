@@ -1,0 +1,59 @@
+const puppeteer = require("puppeteer");
+
+const crawler = async () => {
+    try {
+        let browser = await puppeteer.launch({
+            headless: process.env.NODE_ENV === "production",
+            args: ["--window-size=1920,1080"],
+        });
+        let page = await browser.newPage();
+        await page.setViewport({
+            width: 1920,
+            height: 1080,
+        });
+        await page.goto("https://spys.one/free-proxy-list/KR/");
+        const proxies = await page.evaluate(() => {
+            const ips = Array.from(document.querySelectorAll("tr > td:first-of-type > .spy14")).map(
+                (v) => v.textContent.replace(/document\.write\(.+\)/, ""),
+            ); // IP
+            const types = Array.from(document.querySelectorAll("tr > td:nth-of-type(2)"))
+                .slice(5)
+                .map((v) => v.textContent); // Proxy type
+            const latencies = Array.from(
+                document.querySelectorAll("tr > td:nth-of-type(6) > .spy1"),
+            ).map((v) => v.textContent); // Latency
+            return ips.map((v, i) => {
+                return {
+                    ip: v,
+                    type: types[i],
+                    latency: latencies[i],
+                };
+            });
+        });
+        const filtered = proxies
+            .filter((v) => v.type.startsWith("SOCKS5"))
+            .sort((a, b) => a.latency - b.latency);
+        console.log(filtered);
+        await page.close();
+        await browser.close();
+
+        browser = await puppeteer.launch({
+            headless: process.env.NODE_ENV === "production",
+            args: [
+                "--window-size=1920,1080",
+                "--ignore-certificate-errors",
+                `--proxy-server=${filtered[0].ip}`,
+            ],
+        });
+        await page.setViewport({
+            width: 1920,
+            height: 1080,
+        });
+        page = await browser.newPage();
+        await page.goto("https://github.com");
+    } catch (e) {
+        console.error(e);
+    }
+};
+
+crawler();
