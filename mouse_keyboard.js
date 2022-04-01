@@ -92,15 +92,31 @@ const crawler = async () => {
             })();
         });
 
-        await page.waitForTimeout(3000);
-        // 마우스 이동
-        await page.mouse.move(200, 200);
-        // 마우스 드래그
-        await page.mouse.down();
-        await page.waitForTimeout(2000);
-        await page.mouse.move(500, 500);
-        await page.waitForTimeout(2000);
-        await page.mouse.up();
+        // -----마우스 조작-----
+        // await page.waitForTimeout(3000);
+        // // 마우스 이동
+        // await page.mouse.move(200, 200);
+        // // 마우스 드래그
+        // await page.mouse.down();
+        // await page.waitForTimeout(2000);
+        // await page.mouse.move(500, 500);
+        // await page.waitForTimeout(2000);
+        // await page.mouse.up();
+
+        // -----키보드 조작-----
+        await page.click("#email");
+        await page.keyboard.down("ShiftLeft");
+        await page.keyboard.press("KeyA");
+        await page.waitForTimeout(500);
+        await page.keyboard.press("KeyB");
+        await page.waitForTimeout(500);
+        await page.keyboard.press("KeyC");
+        await page.waitForTimeout(500);
+        await page.keyboard.press("KeyD");
+        await page.waitForTimeout(500);
+        await page.keyboard.press("KeyE");
+        await page.waitForTimeout(500);
+        await page.keyboard.up("ShiftLeft");
 
         // await browser.close();
     } catch (e) {
