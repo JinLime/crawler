@@ -1,6 +1,11 @@
 const puppeteer = require("puppeteer");
+const dotenv = require("dotenv");
+
+const db = require("./models");
+dotenv.config();
 
 const crawler = async () => {
+    await db.sequelize.sync();
     try {
         let browser = await puppeteer.launch({
             headless: process.env.NODE_ENV === "production",
@@ -31,8 +36,18 @@ const crawler = async () => {
             });
         });
         const filtered = proxies
-            .filter((v) => v.type.startsWith("SOCKS5"))
+            .filter((v) => v.type.startsWith("HTTP"))
             .sort((a, b) => a.latency - b.latency);
+
+        // await Promise.all(
+        //     filtered.map((v) => {
+        //         return db.Proxy.create({
+        //             ip: v.ip,
+        //             type: v.type,
+        //             latency: v.latency,
+        //         });
+        //     }),
+        // );
         console.log(filtered);
         await page.close();
         await browser.close();
@@ -41,16 +56,23 @@ const crawler = async () => {
             headless: process.env.NODE_ENV === "production",
             args: [
                 "--window-size=1920,1080",
-                "--ignore-certificate-errors",
-                `--proxy-server=${filtered[0].ip}`,
+                // "--ignore-certificate-errors",
+                // `--proxy-server=${filtered[0].ip}`,
             ],
         });
-        await page.setViewport({
+
+        const context = await browser.createIncognitoBrowserContext(); // 시크릿 브라우저
+        console.log(await browser.browserContexts());
+
+        secretPage = await context.newPage();
+
+        await secretPage.setViewport({
             width: 1920,
             height: 1080,
         });
-        page = await browser.newPage();
-        await page.goto("https://github.com");
+
+        await secretPage.goto("https://google.com");
+        await db.sequelize.close();
     } catch (e) {
         console.error(e);
     }

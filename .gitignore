@@ -145,3 +145,4 @@ nodejs-crawler/
 .prettierrc
 .eslintrc.js
 .env
+config/
