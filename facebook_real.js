@@ -2,6 +2,7 @@ const puppeteer = require("puppeteer");
 const dotenv = require("dotenv");
 
 const db = require("./models");
+const { first } = require("cheerio/lib/api/traversing");
 dotenv.config();
 
 const crawler = async () => {
@@ -30,16 +31,45 @@ const crawler = async () => {
         // 피드 로딩 대기
         await page.waitForSelector(".du4w35lb.k4urcfbm.l9j0dhe7.sjgh65i0:nth-child(1)");
 
-        const newPost = await page.evaluate(() => {
-            const firstFeed = document.querySelector(
-                ".du4w35lb.k4urcfbm.l9j0dhe7.sjgh65i0:nth-child(1)",
+        const result = [];
+        while (result.length < 5) {
+            const newPost = await page.evaluate(() => {
+                const firstFeed = document.querySelector(
+                    ".du4w35lb.k4urcfbm.l9j0dhe7.sjgh65i0:nth-child(1)",
+                );
+                const name =
+                    firstFeed.querySelector(".gmql0nx0.l94mrbxd .nc684nl6") &&
+                    firstFeed.querySelector(".gmql0nx0.l94mrbxd .nc684nl6").textContent;
+
+                // const img = Array.from(
+                //     document.querySelectorAll(
+                //         ".pmk7jnqg.kr520xx4 > img[referrerpolicy=origin-when-cross-origin]",
+                //     ),
+                // ).slice(3);
+
+                return { name };
+            });
+
+            result.push(newPost);
+
+            // 좋아요 누르기
+            const likeBtn = await page.$(
+                ".l9j0dhe7.i1ao9s8h.esuyzwwr.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.p8dawk7l.lzcic4wl.gokke00a",
             );
-            const name =
-                firstFeed.querySelector(".gmql0nx0.l94mrbxd .nc684nl6") &&
-                firstFeed.querySelector(".gmql0nx0.l94mrbxd .nc684nl6").textContent;
-            return { name };
-        });
-        console.log(newPost);
+            await page.evaluate((like) => {
+                like.click();
+            }, likeBtn);
+
+            // 크롤링 한 게시물 지우기
+            await page.evaluate(() => {
+                const firstFeed = document.querySelector(
+                    ".du4w35lb.k4urcfbm.l9j0dhe7.sjgh65i0:nth-child(1)",
+                );
+                firstFeed.parentNode.removeChild(firstFeed); // 태그 제거
+            });
+        }
+
+        console.log(result);
         // await page.close();
         // await browser.close();
     } catch (e) {
