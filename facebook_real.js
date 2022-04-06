@@ -32,11 +32,10 @@ const crawler = async () => {
         await page.waitForSelector(".du4w35lb.k4urcfbm.l9j0dhe7.sjgh65i0:nth-child(1)");
 
         const result = [];
+        // 5회 반복
         while (result.length < 5) {
             const newPost = await page.evaluate(() => {
-                const firstFeed = document.querySelector(
-                    ".du4w35lb.k4urcfbm.l9j0dhe7.sjgh65i0:nth-child(1)",
-                );
+                const firstFeed = document.querySelector(".du4w35lb.k4urcfbm.l9j0dhe7.sjgh65i0");
                 const name =
                     firstFeed.querySelector(".gmql0nx0.l94mrbxd .nc684nl6") &&
                     firstFeed.querySelector(".gmql0nx0.l94mrbxd .nc684nl6").textContent;
@@ -53,18 +52,21 @@ const crawler = async () => {
             result.push(newPost);
 
             // 좋아요 누르기
-            const likeBtn = await page.$(
-                ".l9j0dhe7.i1ao9s8h.esuyzwwr.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.p8dawk7l.lzcic4wl.gokke00a",
-            );
-            await page.evaluate((like) => {
-                like.click();
-            }, likeBtn);
+            // const likeBtn = await page.$(
+            //     ".l9j0dhe7.i1ao9s8h.esuyzwwr.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.p8dawk7l.lzcic4wl.gokke00a",
+            // );
+            // await page.evaluate((like) => {
+            //     like.click();
+            // }, likeBtn);
+            // await page.click(
+            //     ".l9j0dhe7.i1ao9s8h.esuyzwwr.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.p8dawk7l.lzcic4wl.gokke00a",
+            // );
+
+            await page.waitForTimeout(2000);
 
             // 크롤링 한 게시물 지우기
             await page.evaluate(() => {
-                const firstFeed = document.querySelector(
-                    ".du4w35lb.k4urcfbm.l9j0dhe7.sjgh65i0:nth-child(1)",
-                );
+                const firstFeed = document.querySelector(".du4w35lb.k4urcfbm.l9j0dhe7.sjgh65i0");
                 firstFeed.parentNode.removeChild(firstFeed); // 태그 제거
             });
         }

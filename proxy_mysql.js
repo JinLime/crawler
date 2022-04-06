@@ -39,15 +39,25 @@ const crawler = async () => {
             .filter((v) => v.type.startsWith("HTTP"))
             .sort((a, b) => a.latency - b.latency);
 
-        // await Promise.all(
-        //     filtered.map((v) => {
-        //         return db.Proxy.create({
-        //             ip: v.ip,
-        //             type: v.type,
-        //             latency: v.latency,
-        //         });
-        //     }),
-        // );
+        // DB에 ip 중복인지 체크
+        const exist = await db.Proxy.findOne({
+            where: {
+                ip: filtered.ip,
+            },
+        });
+        if (!exist) {
+            // DB에 저장
+            await Promise.all(
+                filtered.map((v) => {
+                    return db.Proxy.create({
+                        ip: v.ip,
+                        type: v.type,
+                        latency: v.latency,
+                    });
+                }),
+            );
+        }
+
         console.log(filtered);
         await page.close();
         await browser.close();
