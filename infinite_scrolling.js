@@ -26,6 +26,7 @@ const crawler = async () => {
                     imgEls.forEach((y) => {
                         let src = y.querySelector("img.YVj9w").src;
                         if (src) imgs.push(src);
+                        // 저장한 이미지 페이지에서 제거
                         y.parentElement.removeChild(y);
                     });
                 }

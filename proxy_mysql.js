@@ -35,6 +35,9 @@ const crawler = async () => {
                 };
             });
         });
+
+        console.log(proxies);
+
         const filtered = proxies
             .filter((v) => v.type.startsWith("HTTP"))
             .sort((a, b) => a.latency - b.latency);
@@ -58,7 +61,7 @@ const crawler = async () => {
             );
         }
 
-        console.log(filtered);
+        // console.log(filtered);
         await page.close();
         await browser.close();
 

@@ -17,7 +17,7 @@
     "mysql2": "^2.3.3",
     "puppeteer": "^13.5.1",
     "sequelize": "^6.17.0",
-    "xlsx": "^0.18.4"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "eslint": "^8.11.0",
