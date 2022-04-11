@@ -27,45 +27,50 @@ const crawler = async () => {
 
         await page.click(".form-group:nth-child(1) button");
         await page.waitForTimeout(500);
-        await page.click(".form-group.show:nth-child(1) #challenge_filter_level_2");
+        await page.click(".form-group.show:nth-child(1) #challenge_filter_level_3");
         await page.waitForTimeout(500);
         await page.click(".form-group:nth-child(2) button");
         await page.waitForTimeout(500);
-        await page.click(".form-group.show:nth-child(2) #challenge_filter_language_python3");
+        await page.click(".form-group.show:nth-child(2) #challenge_filter_language_javascript");
         await page.waitForTimeout(2000);
         const result = [];
         let data;
 
-        for (let i = 2; i <= 5; i++) {
+        for (let i = 2; i <= 4; i++) {
             let strI = String(i);
             if (i > 2) {
                 await page.click(`.pagination [class=page-item]:nth-child(${strI}) a`);
                 await page.waitForTimeout(2000);
             }
-
             for (let j = 1; j <= 20; j++) {
                 let strJ = String(j);
                 data = await page.evaluate((strJ) => {
                     // getAttribute('속성') : 요소의 속성값을 가져옴
                     const title = document
                         .querySelector(
-                            `.col-item:nth-child(${strJ}) .card-algorithm.level-2 a .title`,
+                            `.col-item:nth-child(${strJ}) .card-algorithm.level-3 a .title`,
                         )
                         .textContent.trim()
                         .replace(/Lv\..+\s+\s/, "");
 
-                    const href = document
-                        .querySelector(`.col-item:nth-child(${strJ}) .card-algorithm.level-2 a`)
+                    const href = document.querySelector(
+                        `.col-item:nth-child(${strJ}) .card-algorithm.level-3 a`,
+                    ).href;
+
+                    const hrefNum = document
+                        .querySelector(`.col-item:nth-child(${strJ}) .card-algorithm.level-3 a`)
                         .href.replace(/https:.+\//, "");
 
                     const type = document.querySelector(
-                        `.col-item:nth-child(${strJ}) .card-algorithm.level-2 .level`,
+                        `.col-item:nth-child(${strJ}) .card-algorithm.level-3 .level`,
                     ).textContent;
-                    return [title, href, type];
+
+                    // return [`| [${title}](${href}) | [JS](lv4/${hrefNum}.js) | [${type}] | |  `];
+                    return [hrefNum, title, type];
                     // return [title].map((v) => {return {제목: v,번호: href,유형: type,};});
                 }, strJ);
                 result.push(data);
-                if (i === 5 && j === 7) break;
+                if (i === 4 && j === 12) break; // i = 페이지 개수, j = 마지막 페이지 문제 개수
             }
         }
 
@@ -75,7 +80,8 @@ const crawler = async () => {
         records.result;
 
         const str = stringify(result);
-        fs.writeFileSync("csv/lv2.csv", str);
+        fs.writeFileSync("csv/lv3.csv", str);
+        // fs.writeFileSync("csv/lv2.csv", str);
 
         // add_to_sheet(ws, "A1", "s", "제목");
         // add_to_sheet(ws, "B1", "s", "번호");
