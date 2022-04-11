@@ -146,3 +146,5 @@ nodejs-crawler/
 .eslintrc.js
 .env
 config/
+.csv
+.xlsx
