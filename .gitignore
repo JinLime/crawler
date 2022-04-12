@@ -148,3 +148,4 @@ nodejs-crawler/
 config/
 *.csv
 *.xlsx
+.inflearn_alarm.js
