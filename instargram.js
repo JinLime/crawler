@@ -36,6 +36,37 @@ const crawler = async () => {
             console.log("로그인을 완료했습니다");
         }
 
+        // react-virtualized 사용하여 태크 최대 8개로 메모리를 절약
+        let result = [];
+        let prevPostId = "";
+
+        while (result.length < 10) {
+            const newPost = await page.evaluate(() => {
+                const article = document.querySelector("article:nth-child(1)");
+                const postId =
+                    article.querySelector(".c-Yi7") && article.querySelector(".c-Yi7").href;
+                const name =
+                    article.querySelector(".Jv7Aj > a") &&
+                    article.querySelector(".Jv7Aj > a").textContent;
+                const img =
+                    article.querySelector(".KL4Bh img") && article.querySelector(".KL4Bh img").src;
+                return { postId, name, img };
+            });
+
+            if (newPost.postId !== prevPostId) {
+                if (!result.find((v) => v.postId == newPost.postId)) {
+                    result.push(newPost);
+                }
+            }
+            prevPostId = newPost.postId;
+
+            await page.evaluate(() => {
+                window.scrollBy(0, 600);
+            });
+        }
+
+        console.log(result);
+
         // await page.close();
         // await browser.close();
     } catch (e) {
