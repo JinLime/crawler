@@ -2,10 +2,10 @@ const puppeteer = require("puppeteer");
 const dotenv = require("dotenv");
 
 const db = require("./models");
-const { first } = require("cheerio/lib/api/traversing");
 dotenv.config();
 
 const crawler = async () => {
+    await db.sequelize.sync();
     try {
         const browser = await puppeteer.launch({
             headless: process.env.NODE_ENV === "production",
@@ -40,30 +40,56 @@ const crawler = async () => {
         let result = [];
         let prevPostId = "";
 
-        while (result.length < 10) {
+        while (result.length < 3) {
             const newPost = await page.evaluate(() => {
-                const article = document.querySelector("article:nth-child(1)");
+                const article = document.querySelector("article");
                 const postId =
-                    article.querySelector(".c-Yi7") && article.querySelector(".c-Yi7").href;
+                    article.querySelector(".c-Yi7") &&
+                    article.querySelector(".c-Yi7").href.split("/").slice(-2, -1)[0];
                 const name =
                     article.querySelector(".Jv7Aj > a") &&
                     article.querySelector(".Jv7Aj > a").textContent;
                 const img =
                     article.querySelector(".KL4Bh img") && article.querySelector(".KL4Bh img").src;
-                return { postId, name, img };
+                return { postId, img, name };
             });
 
             if (newPost.postId !== prevPostId) {
+                console.log(newPost);
                 if (!result.find((v) => v.postId == newPost.postId)) {
-                    result.push(newPost);
+                    // db에 존재하지 않으면 게시글 추가
+                    const exist = await db.Instagram.findOne({
+                        where: { postId: newPost.postId },
+                    });
+                    if (!exist) {
+                        result.push(newPost);
+                    }
                 }
             }
-            prevPostId = newPost.postId;
 
+            await page.waitForTimeout(1000);
+            await page.evaluate(() => {
+                const likeBtn = document.querySelector(".QBdPU.rrUvL > span");
+                if (likeBtn.querySelector("svg").getAttribute("width") === "24") {
+                    likeBtn.click();
+                }
+            });
+
+            prevPostId = newPost.postId;
+            await page.waitForTimeout(500);
             await page.evaluate(() => {
                 window.scrollBy(0, 600);
             });
         }
+        await Promise.all(
+            result.map((v) => {
+                return db.Instagram.create({
+                    postId: v.postId,
+                    media: v.img,
+                    writer: v.name,
+                });
+            }),
+        );
 
         console.log(result);
 
