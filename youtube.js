@@ -1,6 +1,8 @@
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const dotenv = require("dotenv");
+const fs = require("fs");
+const ytdl = require("ytdl-core"); // 유튜브 다운로드 라이브러리
 
 puppeteer.use(StealthPlugin());
 dotenv.config();
@@ -21,12 +23,13 @@ const crawler = async () => {
             waitUntil: "networkidle0", // 네트워크 요청 모두 불러올 때까지 기다림, 단 영상 같은 경우는 계속 불러와야 하므로 사용 X
         });
 
-        await page.waitForSelector("#buttons ytd-button-renderer:last-child a");
-        await page.click("#buttons ytd-button-renderer:last-child a");
+        // 구글 로그인
+        // await page.waitForSelector("#buttons ytd-button-renderer:last-child a");
+        // await page.click("#buttons ytd-button-renderer:last-child a");
 
-        await page.waitForNavigation({
-            waitUntil: "networkidle2", // 네트워크 요청 2개정도 남기고 기다림
-        });
+        // await page.waitForNavigation({
+        //     waitUntil: "networkidle2", // 네트워크 요청 2개정도 남기고 기다림
+        // });
 
         // await page.waitForSelector("#identifierId");
         // await page.type("#identifierId", process.env.EMAIL);
@@ -51,6 +54,19 @@ const crawler = async () => {
         // await page.waitForNavigation({
         //     waitUntil: "networkidle2", // 네트워크 요청 2개정도 남기고 기다림
         // });
+
+        // 영상 다운로드
+        await page.waitFor(1000);
+        await page.goto("https://www.youtube.com/watch?v=22rreBwLim8");
+
+        const url = await page.url(); // 현재 주소
+        const title = await page.title(); // 현재 제목
+        console.log(url, title);
+
+        const info = ytdl.getInfo(url); // 동영상 정보
+        console.log(info);
+
+        ytdl(url).pipe(fs.createWriteStream(`${title}.mp4`));
 
         // await page.close();
         // await browser.close();
